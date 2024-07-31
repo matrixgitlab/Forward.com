@@ -4,6 +4,17 @@ const fs = require('fs');
 const path = require('path');
 const { send } = require('process');
 const { extractAndResolveUrls } = require('./textmsgurlmodif.js');
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 4000;
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
 
 // Charger la configuration
 //const config = JSON.parse(fs.readFileSync('mtproto.json'));
