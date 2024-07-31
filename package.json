@@ -1,0 +1,21 @@
+{
+  "name": "groupcom",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@mtproto/core": "6.3.0",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "node-tdlib": "^0.0.0",
+    "prompts": "^2.4.2",
+    "tdl": "^8.0.1",
+    "tdlib": "^0.0.0-alpha.0"
+  }
+}
