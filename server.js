@@ -4,8 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const { send } = require('process');
 const { extractAndResolveUrls } = require('./textmsgurlmodif.js');
-const express = require('express')
-const app = express()
+const { pingGlitchForever } = require("./wakeupPing.js");
+const express = require('express');
+const app = express();
 const port = process.env.PORT || 4000;
 
 app.get('/', (req, res) => {
@@ -253,3 +254,6 @@ async function processUrls(text) {
     console.error('Error:', error);
   }
 })();
+// ping glitch forever
+// not needed of your server is always on by default
+pingGlitchForever();
