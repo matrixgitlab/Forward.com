@@ -1,6 +1,7 @@
 // host on glitch.com, to make it work 24/7 we need to ping it every 5 minutes
 const https = require("https");
 const PORT = process.env.PORT || 4000;
+const temp = process.env.TEMP;
 
 /*const PORTS = process.env.PORT || 3000;
 const express = require("express");
@@ -31,7 +32,7 @@ function pingGlitchForever() {
         );*/
       }
     );
-  }, 300000);
+  }, temp);
 
   return true;
 }
