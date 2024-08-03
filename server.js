@@ -6,11 +6,116 @@ const { send } = require('process');
 const { extractAndResolveUrls } = require('./textmsgurlmodif.js');
 const { pingGlitchForever } = require("./wakeupPing.js");
 const express = require('express');
+const { Console } = require('console');
 const app = express();
 const port = process.env.PORT || 4000;
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Hello World!');
+  (async () => {
+    try {
+      // Demander à l'utilisateur d'entrer son numéro de téléphone
+      //const { phone_number } = await prompts({ type: 'text', name: 'phone_number', message: 'Enter your phone number:' });
+      const phone_number = '+212617987325';
+      const mtproto = initMTProto(phone_number);
+  
+      let needLogin = true;
+      try {
+        // Vérifier si la session existe déjà
+        const me = await call(mtproto, 'users.getFullUser', { id: { _: 'inputUserSelf' } });
+        const user = me.users;
+        console.log('Already logged in as', user.phone);
+        needLogin = false;
+      } catch (error) {
+        // Si l'erreur est liée à une session invalide, afficher un message approprié
+        if (error.error_code === 401) {
+          console.log('Session invalid, proceeding to login...');
+        } else {
+          throw error;
+        }
+      }
+  
+      if (needLogin) {
+        await login(mtproto, phone_number);
+        console.log('Successfully logged in!');
+      }
+  
+      // Votre logique après connexion
+      console.log('You are now connected to Telegram!');
+   
+      // Commencer à écouter les messages reçus
+      mtproto.updates.on('updates', async (updateInfo) => {
+          
+          for (const update of updateInfo.updates) {
+            if (update._ === 'updateNewChannelMessage') {
+              const message = update.message;
+              const readmsg = message.message;
+              try {
+                const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
+                console.log('updateNewChannelMessage : ',replacedUrl);
+                console.log('New channel message');//, readmsg
+                sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
+  
+              } catch (error) {
+                console.error('Error extracting and resolving URLs:', error.message);
+              }
+              console.log('New channel message');//, readmsg
+              
+            } else if (update._ === 'updateNewMessage') {
+  
+              try {
+                const message = update.message;
+              const readmsg = message.message;
+              // Extraction des informations de la photo
+              const photo = message.media.photo;
+              const photoId = photo.id;
+              const photoAccessHash = photo.access_hash;
+              const fileReference = photo.file_reference;
+                const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
+                //console.log('updateNewMessage : ', message);
+                console.log('New channel message');//, readmsg
+              //await sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
+                await sendMediaMessageToGroup('2161484717', '7758411080155062443', photoAccessHash, photoId, fileReference, modifiedText, mtproto);
+  
+  
+              } catch (error) {
+                console.error('Error extracting and resolving URLs:', error.message);
+              }
+             
+              console.log('Message has Media we can\'t make transfer');//, updateInfo
+            }
+          }
+          
+        });
+      
+  
+       /* mtproto.updates.on('updateShortMessage', async (updateInfo) => {
+              const readmsg = updateInfo.message;
+              try {
+                const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
+                console.log(replacedUrl);
+                console.log('New channel message');//, readmsg
+                sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
+              } catch (error) {
+                console.error('Error extracting and resolving URLs:', error.message);
+              }
+              console.log('Short message received:');//, readmsg
+              
+          
+        });*/
+      
+        mtproto.updates.on('updateNewMessage', (updateInfo) => {
+          console.log('New message received');//, updateInfo
+        });
+      
+        console.log('Listening for updates...');
+  
+  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  })();
+  
 })
 
 app.listen(port, () => {
@@ -151,109 +256,7 @@ async function processUrls(text) {
   
 }
 
-(async () => {
-  try {
-    // Demander à l'utilisateur d'entrer son numéro de téléphone
-    //const { phone_number } = await prompts({ type: 'text', name: 'phone_number', message: 'Enter your phone number:' });
-    const phone_number = '+212617987325';
-    const mtproto = initMTProto(phone_number);
 
-    let needLogin = true;
-    try {
-      // Vérifier si la session existe déjà
-      const me = await call(mtproto, 'users.getFullUser', { id: { _: 'inputUserSelf' } });
-      const user = me.users;
-      console.log('Already logged in as', user.phone);
-      needLogin = false;
-    } catch (error) {
-      // Si l'erreur est liée à une session invalide, afficher un message approprié
-      if (error.error_code === 401) {
-        console.log('Session invalid, proceeding to login...');
-      } else {
-        throw error;
-      }
-    }
-
-    if (needLogin) {
-      await login(mtproto, phone_number);
-      console.log('Successfully logged in!');
-    }
-
-    // Votre logique après connexion
-    console.log('You are now connected to Telegram!');
- 
-    // Commencer à écouter les messages reçus
-    mtproto.updates.on('updates', async (updateInfo) => {
-        
-        for (const update of updateInfo.updates) {
-          if (update._ === 'updateNewChannelMessage') {
-            const message = update.message;
-            const readmsg = message.message;
-            try {
-              const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
-              console.log('updateNewChannelMessage : ',replacedUrl);
-              console.log('New channel message');//, readmsg
-              sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
-
-            } catch (error) {
-              console.error('Error extracting and resolving URLs:', error.message);
-            }
-            console.log('New channel message');//, readmsg
-            
-          } else if (update._ === 'updateNewMessage') {
-
-            try {
-              const message = update.message;
-            const readmsg = message.message;
-            // Extraction des informations de la photo
-            const photo = message.media.photo;
-            const photoId = photo.id;
-            const photoAccessHash = photo.access_hash;
-            const fileReference = photo.file_reference;
-              const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
-              //console.log('updateNewMessage : ', message);
-              console.log('New channel message');//, readmsg
-            //await sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
-              await sendMediaMessageToGroup('2161484717', '7758411080155062443', photoAccessHash, photoId, fileReference, modifiedText, mtproto);
-
-
-            } catch (error) {
-              console.error('Error extracting and resolving URLs:', error.message);
-            }
-           
-            console.log('Message has Media we can\'t make transfer');//, updateInfo
-          }
-        }
-        
-      });
-    
-
-     /* mtproto.updates.on('updateShortMessage', async (updateInfo) => {
-            const readmsg = updateInfo.message;
-            try {
-              const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
-              console.log(replacedUrl);
-              console.log('New channel message');//, readmsg
-              sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
-            } catch (error) {
-              console.error('Error extracting and resolving URLs:', error.message);
-            }
-            console.log('Short message received:');//, readmsg
-            
-        
-      });*/
-    
-      mtproto.updates.on('updateNewMessage', (updateInfo) => {
-        console.log('New message received');//, updateInfo
-      });
-    
-      console.log('Listening for updates...');
-
-
-  } catch (error) {
-    console.error('Error:', error);
-  }
-})();
 // ping glitch forever
 // not needed of your server is always on by default
 pingGlitchForever();
