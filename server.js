@@ -48,18 +48,26 @@ app.get('/', (req, res) => {
           
           for (const update of updateInfo.updates) {
             if (update._ === 'updateNewChannelMessage') {
-              const message = update.message;
-              const readmsg = message.message;
+              
               try {
-                const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
-                console.log('updateNewChannelMessage : ',replacedUrl);
-                console.log('New channel message');//, readmsg
-                sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
+                const message = update.message;
+                const readmsg = message.message;
+                // Extraction des informations de la photo
+                const photo = message.media.photo;
+                const photoId = photo.id;
+                const photoAccessHash = photo.access_hash;
+                const fileReference = photo.file_reference;
+                  const { modifiedText, finalPart, replacedUrl } = await extractAndResolveUrls(readmsg);
+                  //console.log('updateNewMessage : ', message);
+                  console.log('New channel message');//, readmsg
+                //await sendMessageToGroup('2161484717', '7758411080155062443', modifiedText, mtproto);
+                  await sendMediaMessageToGroup('2161484717', '7758411080155062443', photoAccessHash, photoId, fileReference, modifiedText, mtproto);
+    
   
               } catch (error) {
                 console.error('Error extracting and resolving URLs:', error.message);
               }
-              console.log('New channel message');//, readmsg
+              //console.log('New channel message');//, readmsg
               
             } else if (update._ === 'updateNewMessage') {
   

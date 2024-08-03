@@ -1,7 +1,9 @@
 // host on glitch.com, to make it work 24/7 we need to ping it every 5 minutes
 const https = require("https");
+const { send } = require('process');
+require('dotenv').config();
 const PORT = process.env.PORT || 4000;
-const temp = process.env.TEMP;
+const test = process.env.TEMP;
 
 /*const PORTS = process.env.PORT || 3000;
 const express = require("express");
@@ -25,6 +27,7 @@ function pingGlitchForever() {
       options,
       (res) => {
         console.log(`Response status: ${res.statusCode}`);
+        console.log(test);
         /*tell me if the bot is working, to know i should restart it if it's not
         bot.telegram.sendMessage(
           process.env.MY_NUMBER,
@@ -32,7 +35,7 @@ function pingGlitchForever() {
         );*/
       }
     );
-  }, temp);
+  }, 300000);
 
   return true;
 }
