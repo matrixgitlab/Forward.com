@@ -23,7 +23,7 @@ const options = {
 function pingGlitchForever() {
   setInterval(() => {
     https.get(
-      `https://teleforward-kffl.onrender.com`,
+      `https://telforward.onrender.com`,
       options,
       (res) => {
         console.log(`Response status: ${res.statusCode}`);
