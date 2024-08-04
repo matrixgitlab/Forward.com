@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 async function scrapePage(aliexpressUrl) {
   const browser = await puppeteer.launch({ headless: true,
-                                           executablePath:'/opt/render/project/src/.cache/puppeteer/chrome/linux-126.0.6478.126/chrome-linux64/chrome'});
+                                           executablePath:'/opt/render/project/src/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome'});
   const page = await browser.newPage();
 
   // Définir un cookie spécifique
