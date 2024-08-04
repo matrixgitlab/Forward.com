@@ -17,7 +17,7 @@
     "https": "^1.0.0",
     "node-tdlib": "^0.0.0",
     "prompts": "^2.4.2",
-    "puppeteer": "^22.12.1",
+    "puppeteer": "^10.0.0",
     "tdl": "^8.0.1",
     "tdlib": "^0.0.0-alpha.0"
   }
