@@ -1,4 +1,7 @@
 const axios = require('axios');
+const puppeteer = require('puppeteer');
+const scrapePage = require('./affiliatelink.js'); // Assurez-vous que le chemin du fichier est correct
+
 
 // Fonction pour obtenir l'URL finale d'un lien
 const getProductUrl = async (url) => {
@@ -55,7 +58,9 @@ const extractAndResolveUrls = async (text) => {
       const extractedPart = extractFinalPart(finalUrl);
       lastExtractedPart = extractedPart; // Met à jour la dernière partie extraite
       if (/^\d+\.html$/.test(extractedPart)) { // Vérifie si la partie extraite correspond au format souhaité
+        
         validFinalPart = extractedPart;
+
       }
     } catch (error) {
       console.error(error.message);
@@ -70,11 +75,24 @@ const extractAndResolveUrls = async (text) => {
   }
 
   // Remplacer toutes les URL initiales par la partie extraite choisie
-  const replacedUrl = 'https://www.aliexpress.com/item/'+partToUse;
-  //console.log(replacedUrl);
-  modifiedText = text.replace(regex, replacedUrl);
+  try {
+    console.log('Waiting for creation the affiliate link of : ', 'https://www.aliexpress.com/item/'+partToUse)
+    const results = await scrapePage('https://www.aliexpress.com/item/'+partToUse);
+    console.log('Résultats:', results);
+    const replacedUrl = results;
+    modifiedText = text.replace(regex, replacedUrl);
 
-  return { modifiedText, finalPart: partToUse, replacedUrl };
+    return { modifiedText, finalPart: partToUse, replacedUrl };
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'exécution du script Puppeteer:', error);
+    const replacedUrl = 'https://www.aliexpress.com/item/'+partToUse;
+    modifiedText = text.replace(regex, replacedUrl);
+
+    return { modifiedText, finalPart: partToUse, replacedUrl };
+    
+  }
+
 };
 
 /* Exemple d'utilisation
