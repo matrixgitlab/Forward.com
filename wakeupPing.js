@@ -35,7 +35,7 @@ function pingGlitchForever() {
         );*/
       }
     );
-  }, 300000);
+  }, test);
 
   return true;
 }
